@@ -35,7 +35,7 @@ export default class Basic extends React.Component {
   }
 
   public componentDidMount() {
-    const container = this.refs['webgl-canvas'] as HTMLElement;
+    const container = this.openglRef.current as HTMLElement;
     container.appendChild(this.renderer.domElement);
     // const camera = this.scene.add(camera);
 

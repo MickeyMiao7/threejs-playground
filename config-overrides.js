@@ -17,7 +17,7 @@ module.exports = function override(config, env) {
         tsImportPluginFactory({
           libraryDirectory: 'es',
           libraryName: 'antd',
-          style: true
+          style: 'css'
         })
       ]
     })
@@ -39,6 +39,7 @@ module.exports = function override(config, env) {
   }
   config.module.rules.push(sassLoader);
 
+
   const textExtension = /\.txt$/;
   fileLoader.exclude.push(textExtension);
   const textLoader = {
@@ -47,20 +48,6 @@ module.exports = function override(config, env) {
   };
 
   config.module.rules.push(textLoader);
-  // const glslLoader = {
-  //   test: /\.glsl$/,
-  //   exclude: /node_modules/,
-  //   loader: 'webpack-glsl-loader'
-  // }
-  // const glslLoader = {
-    // test: /\.glsl$/,
-    // exclude: /node_modules/,
-    // use: [
-      // 'raw-loader',
-      // 'glslify-loader'
-    // ]
-  // };
-// 
 
   const glslExtension = /\.glsl$/;
   fileLoader.exclude.push(glslExtension);

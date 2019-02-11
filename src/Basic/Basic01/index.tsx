@@ -8,9 +8,8 @@ import * as THREE from 'three';
 export default class Basic extends React.Component {
   private openglRef = React.createRef<HTMLDivElement>();
   public componentDidMount() {
-    const container = this.openglRef.current;
+    const container = this.openglRef.current as HTMLElement;
     const renderer = new THREE.WebGLRenderer();
-    openglRef = React.createRef<HTMLDivElement>();
 
     renderer.setSize(800, 800);
     container.appendChild(renderer.domElement);

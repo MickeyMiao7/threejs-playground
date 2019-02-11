@@ -9,7 +9,7 @@ import Basic01 from './Basic/Basic01';
 import Basic02 from './Basic/Basic02';
 import Basic03 from './Basic/Basic03';
 
-import { Menu, Icon } from 'antd'; 
+import { Menu } from 'antd'; 
 const SubMenu = Menu.SubMenu;
 
 console.log(vertexShader);
@@ -17,46 +17,23 @@ interface IState {
   openKeys: string[];
 }
 class App extends React.Component<any, IState> {
-  private rootSubmenuKeys = ['sub1', 'sub2', 'sub4'];
   constructor(props: any) {
     super(props);
     this.state = {
-      openKeys: ['sub1'],
+      openKeys: ['basic'],
     };
   }
 
-  public onOpenChange = (openKeys: string[]) => {
-    const latestOpenKey = openKeys.find(key => this.state.openKeys.indexOf(key) === -1);
-    if (latestOpenKey) {
-      if (this.rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
-        this.setState({ openKeys });
-      }
-      return;
-    }
-    this.setState({
-      openKeys: latestOpenKey ? [latestOpenKey] : [],
-    });
-  }
   public render() {
     return (
       <HashRouter>
         <div id="three-playground">
           <aside>
-            <Menu mode="inline" openKeys={this.state.openKeys} onOpenChange={this.onOpenChange}>
-              <SubMenu key="sub1" title={<span><Icon type="mail" /><span>Basic</span></span>}>
+            <Menu mode="inline" defaultOpenKeys={['basic']}>
+              <SubMenu key="basic" title={<span>Basic</span>}>
                 <Menu.Item key="1"><Link to="/basic/1">1</Link></Menu.Item>
                 <Menu.Item key="2"><Link to="/basic/2">2</Link></Menu.Item>
                 <Menu.Item key="3"><Link to="/basic/3">3</Link></Menu.Item>
-              </SubMenu>
-              <SubMenu key="sub2" title={<span><Icon type="appstore" /><span>Navigation Two</span></span>}>
-                <Menu.Item key="5">Option 5</Menu.Item>
-                <Menu.Item key="6">Option 6</Menu.Item>
-              </SubMenu>
-              <SubMenu key="sub4" title={<span><Icon type="setting" /><span>Navigation Three</span></span>}>
-                <Menu.Item key="9">Option 9</Menu.Item>
-                <Menu.Item key="10">Option 10</Menu.Item>
-                <Menu.Item key="11">Option 11</Menu.Item>
-                <Menu.Item key="12">Option 12</Menu.Item>
               </SubMenu>
             </Menu>
           </aside>

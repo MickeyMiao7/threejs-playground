@@ -43,7 +43,7 @@ export default class Basic extends React.Component {
   }
 
   public componentDidMount() {
-    const container = this.refs['webgl-canvas'] as HTMLDivElement;
+    const container = this.openglRef.current as HTMLElement;
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(800, 800);
     container.appendChild(renderer.domElement);
