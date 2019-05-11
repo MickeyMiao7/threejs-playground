@@ -5,8 +5,8 @@
 import * as React from 'react';
 import * as THREE from 'three';
 import * as vertexShader from './vertex.glsl';
+import * as fragmentShader from './fragment.glsl';
 import OrbitControls from 'orbit-controls-es6';
-console.log(vertexShader);
 
 export default class Basic extends React.Component<any, any> {
   private openglRef = React.createRef<HTMLDivElement>();
@@ -44,16 +44,19 @@ export default class Basic extends React.Component<any, any> {
     light.position.set(15, 15, 15);
     this.scene.add(light);
 
-    const geometry = new THREE.ConeGeometry(5, 5, 3);
+    const uniforms = {
+      time: { type: "f", value: 1.0 },
+      resolution: { type: "v2", value: new THREE.Vector2() }
+    }
 
-    // Line Border
-    const lineMaterial = new THREE.LineBasicMaterial( { color: 0xffffff, transparent: true, opacity: 0.5 } );
-    const meshMaterial = new THREE.MeshPhongMaterial( { color: 0x156289, emissive: 0x072534, side: THREE.DoubleSide, flatShading: true } );
+    const material = new THREE.ShaderMaterial({
+      uniforms,
+      vertexShader,
+      fragmentShader
+    });
 
-    const cone = new THREE.Mesh(geometry, meshMaterial);
-    const line = new THREE.LineSegments(geometry, lineMaterial)
-    this.scene.add(cone);
-    this.scene.add(line);
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
+    this.scene.add(mesh);
     this.animate();
   }
   
