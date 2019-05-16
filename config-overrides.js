@@ -49,14 +49,23 @@ module.exports = function override(config, env) {
 
   config.module.rules.push(textLoader);
 
-  const glslExtension = /\.glsl$/;
-  fileLoader.exclude.push(glslExtension);
+  const glslExtension = /\.glsl$/i;
+  const objFileExtension = /\.(fbx|obj|mtl)$/i;
+
+  fileLoader.exclude.push(glslExtension, objFileExtension);
+
   const glslLoader = {
     test: /\.glsl$/,
     use: 'raw-loader',
     exclude: /node_modules/
   }
   config.module.rules.push(glslLoader);
+
+  const objLoader = {
+    test: objFileExtension,
+    loader: 'url-loader'
+  }
+  config.module.rules.push(objLoader);
 
   return config;
 }
