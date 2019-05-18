@@ -1,6 +1,7 @@
 /* tslint:disable */
 const tsImportPluginFactory = require('ts-import-plugin');
 const { getLoader } = require('react-app-rewired');
+const path = require('path');
 
 module.exports = function override(config, env) {
   const tsLoader = getLoader(
@@ -48,6 +49,7 @@ module.exports = function override(config, env) {
   };
 
   config.module.rules.push(textLoader);
+
 
   const glslExtension = /\.glsl$/i;
   const objFileExtension = /\.(fbx|obj|mtl)$/i;

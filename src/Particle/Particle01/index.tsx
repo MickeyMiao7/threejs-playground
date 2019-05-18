@@ -4,16 +4,17 @@
  */
 import * as React from 'react';
 // tslint:disable-next-line
-const THREE = require('three');
+import * as THREE from 'three';
 import OrbitControls from 'orbit-controls-es6';
 import * as vertexShader from './vertex.glsl';
 import * as fragmentShader from './fragment.glsl';
-console.log(vertexShader);
-console.log(fragmentShader);
-import * as FBXLoader from 'three-fbx-loader';
-import * as robotFBX from './obj/robot.FBX';
+import * as robotFBXData from 'models/fbx/robot.FBX';
+import * as guitarFBXData from 'models/fbx/guitar/guitar.FBX';
+import loader from 'utils/loader';
+import * as TWEEN from 'three-tween';
 
-const fbxLoader = new FBXLoader();
+const robotFBX = { data: robotFBXData, format: 'fbx' };
+const guitarFBX = { data: guitarFBXData, format: 'fbx' };
 
 export default class Particle01 extends React.Component {
   private openglRef = React.createRef<HTMLDivElement>();
@@ -81,17 +82,26 @@ export default class Particle01 extends React.Component {
 
   }
 
-  public addObjs = () => {
-    fbxLoader.load(robotFBX, (group: any) => {
-        // 提取出其几何模型
-        const robotObj = group.children[1].geometry;
+  public addObjs = async () => {
+    // loader(['Particle/Particle01/obj/robot.FBX']).then(value => {console.log(value)});
+    loader([robotFBX, guitarFBX])
+      .then(([robotGroup, guitarGroup]: any) => {
         // 适当变换使其完整在屏幕显示
+        const robotObj = robotGroup.children[1].geometry;
+        const guitarObj = guitarGroup.children[0].geometry;
+        console.log(guitarObj);
         robotObj.scale(0.08, 0.08, 0.08);
         robotObj.rotateX(-Math.PI / 2);
         robotObj.applyMatrix(new THREE.Matrix4().makeTranslation(0, 10, 0));
+
+        this.addParticle([robotObj, guitarObj]);
+      });
+        // // 提取出其几何模型
+        // const robotObj = group.children[1].geometry;
+        // return robotObj;
         // 把它变成粒子
-        this.addParticle(robotObj);
-    });
+        // this.addParticle(robotObj);
+    // });
   }
 
   public toBufferGeometry(geometry: any) {
@@ -101,13 +111,46 @@ export default class Particle01 extends React.Component {
     return new THREE.BufferGeometry().fromGeometry(geometry);
 }
 
-  public addParticle = (obj: any) => {
-    const bufferGeometry = this.toBufferGeometry(obj);
+  public addParticle = (objs: any[]) => {
+    const [bufferGeometry1, bufferGeometry2] = objs.map(obj => this.toBufferGeometry(obj));
+    // 找到顶点数量较多的模型
+    const [moreObj, lessObj] = bufferGeometry1.attributes.position.array.length > bufferGeometry2.attributes.position.array.length ? [bufferGeometry1, bufferGeometry2] : [bufferGeometry2, bufferGeometry1];
+
+    const morePos = moreObj.attributes.position.array;
+    const lessPos = lessObj.attributes.position.array;
+    const moreLen = morePos.length;
+    const lessLen = lessPos.length;
+    console.log(moreLen, lessLen)
+
+    // 根据最大的顶点数开辟数组空间，同于存放顶点较少的模型顶点数据
+    const position2 = new Float32Array(moreLen);
+    // 先把顶点较少的模型顶点坐标放进数组
+    position2.set(lessPos);
+    // 剩余空间重复赋值
+    for (let i = lessLen, j = 0; i < moreLen; i++, j++) {
+      j %= lessLen;
+      position2[i] = lessPos[j];
+      position2[i + 1] = lessPos[j + 1];
+      position2[i + 2] = lessPos[j + 2];
+    }
+    // sizes用来控制每个顶点的尺寸，初始为4
+    const sizes = new Float32Array(moreLen);
+    for (let i = 0; i < moreLen; i++) {
+      sizes[i] = 4;
+    }
+
+    // 挂载属性值
+    moreObj.addAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    moreObj.addAttribute('position2', new THREE.BufferAttribute(position2, 3));
+
     const uniforms = {
         // 传递的颜色属性
       color: {
         type: 'v3', // 指定变量类型为三维向量
         value: new THREE.Color(0xffffff)
+      },
+      val: {
+        value: 1.0
       }
     };
     // 创建着色器材料
@@ -123,7 +166,31 @@ export default class Particle01 extends React.Component {
       // 开启透明度
       transparent: true
     });
-    const particleSystem = new THREE.Points(bufferGeometry, shaderMaterial);
+    const pos = {
+      val: 1
+    };
+    const particleSystem = new THREE.Points(moreObj, shaderMaterial);
+
+    // 使val值从0到1，1到0循环往复变化
+    const tween = new TWEEN.Tween(pos).to({
+      val: 0
+    }, 1500).easing(TWEEN.Easing.Quadratic.InOut).delay(1000).onUpdate(callback);
+
+    const tweenBack = new TWEEN.Tween(pos).to({
+        val: 1
+    }, 1500).easing(TWEEN.Easing.Quadratic.InOut).delay(1000).onUpdate(callback);
+
+    tween.chain(tweenBack);
+    tweenBack.chain(tween);
+    tween.start();
+    // 每次都将更新的val值赋值给uniforms，让其传递给shader
+    console.log(particleSystem.material);
+    function callback() {
+      // tslint-disable-next-line
+      (particleSystem.material as any).uniforms.val.value = pos.val;
+    }
+
+    // const particleSystem = new THREE.Points(bufferGeometry1, shaderMaterial);
     // const pointMaterial = new THREE.PointsMaterial({
     //   // 粒子颜色
     //   color: 0xffffff,
@@ -131,7 +198,6 @@ export default class Particle01 extends React.Component {
     //   size: 2
     // });
     // const particleSystem = new THREE.Points(bufferGeometry, pointMaterial);
-    console.log(particleSystem);
     this.scene.add(particleSystem);
   }
 
