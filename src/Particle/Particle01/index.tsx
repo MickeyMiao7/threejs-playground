@@ -166,11 +166,11 @@ export default class Particle01 extends React.Component {
       // 开启透明度
       transparent: true
     });
+    const particleSystem = new THREE.Points(moreObj, shaderMaterial);
+
     const pos = {
       val: 1
     };
-    const particleSystem = new THREE.Points(moreObj, shaderMaterial);
-
     // 使val值从0到1，1到0循环往复变化
     const tween = new TWEEN.Tween(pos).to({
       val: 0
