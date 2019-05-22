@@ -39,6 +39,7 @@ export default class Particle01 extends React.Component {
   }
 
   public animate = () => {
+    TWEEN.update();
     requestAnimationFrame(this.animate);
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
