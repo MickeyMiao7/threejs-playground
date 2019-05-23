@@ -16,12 +16,24 @@ import * as TWEEN from 'three-tween';
 const robotFBX = { data: robotFBXData, format: 'fbx' };
 const guitarFBX = { data: guitarFBXData, format: 'fbx' };
 
+interface IColor {
+  r: number;
+  g: number;
+  b: number;
+}
 export default class Particle01 extends React.Component {
   private openglRef = React.createRef<HTMLDivElement>();
   private renderer: THREE.WebGLRenderer;
   private scene: THREE.Scene;
   private camera: THREE.PerspectiveCamera;
   private controls: OrbitControls;
+  private particleSystem: THREE.Points;
+
+  private pos = { value: 1.0 };
+  private order = 'back';
+  private color: IColor;
+  private nextColor: IColor;
+  
   constructor(props: any) {
     super(props);
     this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -30,7 +42,7 @@ export default class Particle01 extends React.Component {
 
     this.scene = new THREE.Scene(); 
     this.camera = new THREE.PerspectiveCamera(60, 1200 / 800, 1, 10000);
-    this.camera.position.set(-100, -75, -50);
+    this.camera.position.set(0, 150, 0);
     this.camera.lookAt(new THREE.Vector3(0, 0, 0));
     this.scene.add(this.camera);
     
@@ -40,9 +52,40 @@ export default class Particle01 extends React.Component {
 
   public animate = () => {
     TWEEN.update();
+
+    // 动态改变size大小
+    const time = Date.now() * 0.005;
+    if (this.particleSystem) {
+      const bufferGeometry = this.particleSystem.geometry as any;
+      // 粒子系统缓缓旋转
+      this.particleSystem.rotation.y = 0.01 * time;
+      const sizes = bufferGeometry.attributes.size.array;
+      for (let i = 0; i < sizes.length; i++) {
+        sizes[i] = 2.5 + 1.5 * Math.sin(0.02 * i + time);
+      }
+      bufferGeometry.attributes.size.needsUpdate = true;
+    }
     requestAnimationFrame(this.animate);
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
+  }
+
+  public createTexture = (canvasSize = 64) => {
+    const canvas = document.createElement('canvas') as HTMLCanvasElement;
+    canvas.width = canvasSize;
+    canvas.height = canvasSize;
+    canvas.style.background = "transparent";
+    const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+    const gradient = context.createRadialGradient(canvas.width / 2, canvas.height / 2, canvas.width / 8, canvas.width / 2, canvas.height / 2, canvas.width / 2);
+    gradient.addColorStop(0, '#fff');
+    gradient.addColorStop(1, 'transparent');
+    context.fillStyle = gradient;
+    context.beginPath();
+    context.arc(canvas.width / 2, canvas.height / 2, canvas.width / 2, 0, Math.PI * 2, true);
+    context.fill();
+    const texture = new THREE.Texture(canvas);
+    texture.needsUpdate = true;
+    return texture;
   }
 
   public createLights = () => {
@@ -90,7 +133,6 @@ export default class Particle01 extends React.Component {
         // 适当变换使其完整在屏幕显示
         const robotObj = robotGroup.children[1].geometry;
         const guitarObj = guitarGroup.children[0].geometry;
-        console.log(guitarObj);
         robotObj.scale(0.08, 0.08, 0.08);
         robotObj.rotateX(-Math.PI / 2);
         robotObj.applyMatrix(new THREE.Matrix4().makeTranslation(0, 10, 0));
@@ -121,7 +163,6 @@ export default class Particle01 extends React.Component {
     const lessPos = lessObj.attributes.position.array;
     const moreLen = morePos.length;
     const lessLen = lessPos.length;
-    console.log(moreLen, lessLen)
 
     // 根据最大的顶点数开辟数组空间，同于存放顶点较少的模型顶点数据
     const position2 = new Float32Array(moreLen);
@@ -152,6 +193,9 @@ export default class Particle01 extends React.Component {
       },
       val: {
         value: 1.0
+      },
+      texture: {
+        value: this.createTexture()
       }
     };
     // 创建着色器材料
@@ -167,29 +211,55 @@ export default class Particle01 extends React.Component {
       // 开启透明度
       transparent: true
     });
-    const particleSystem = new THREE.Points(moreObj, shaderMaterial);
+    this.particleSystem = new THREE.Points(moreObj, shaderMaterial);
 
-    const pos = {
-      val: 1
+    // 使value值从0到1，1到0循环往复变化
+    const updateCallback = () => {
+      (this.particleSystem.material as any).uniforms.val.value = this.pos.value;
+      if (this.nextColor) {
+        const value = this.order === 'go' ? this.pos.value : 1 - this.pos.value; 
+        const uColor: IColor = (this.particleSystem.material as any).uniforms.color.value;
+        uColor.r = this.color.r + (this.nextColor.r - this.color.r) * value;
+        uColor.g = this.color.g + (this.nextColor.g - this.color.g) * value;
+        uColor.b = this.color.b + (this.nextColor.b - this.color.b) * value;
+        // uColor.r = this.nextColor.r;
+        // uColor.g = this.nextColor.g;
+        // uColor.b = this.nextColor.b;
+        // console.log(this.order);
+        // console.log(this.color);
+      }
     };
-    // 使val值从0到1，1到0循环往复变化
-    const tween = new TWEEN.Tween(pos).to({
-      val: 0
-    }, 1500).easing(TWEEN.Easing.Quadratic.InOut).delay(1000).onUpdate(callback);
 
-    const tweenBack = new TWEEN.Tween(pos).to({
-        val: 1
-    }, 1500).easing(TWEEN.Easing.Quadratic.InOut).delay(1000).onUpdate(callback);
+    const completeCallback = (order: string) => {
+      const uColor = (this.particleSystem.material as any).uniforms.color.value;
+      // 保存动画顺序状态
+      this.order = order;
+      // 保存旧的粒子颜色
+      this.color = {
+        r: uColor.r,
+        b: uColor.b,
+        g: uColor.g
+      }
+      // 随机生成将要变换后的粒子颜色
+      this.nextColor = {
+        r: Math.random(),
+        b: Math.random(),
+        g: Math.random()
+      }
+    }
+
+    const tween = new TWEEN.Tween(this.pos).to({
+      value: 0
+    }, 1500).easing(TWEEN.Easing.Quadratic.InOut).delay(1000).onUpdate(updateCallback).onComplete(completeCallback.bind(this.pos, 'go'));
+
+    const tweenBack = new TWEEN.Tween(this.pos).to({
+      value: 1
+    }, 1500).easing(TWEEN.Easing.Quadratic.InOut).delay(1000).onUpdate(updateCallback).onComplete(completeCallback.bind(this.pos, 'back'));
 
     tween.chain(tweenBack);
     tweenBack.chain(tween);
     tween.start();
     // 每次都将更新的val值赋值给uniforms，让其传递给shader
-    console.log(particleSystem.material);
-    function callback() {
-      // tslint-disable-next-line
-      (particleSystem.material as any).uniforms.val.value = pos.val;
-    }
 
     // const particleSystem = new THREE.Points(bufferGeometry1, shaderMaterial);
     // const pointMaterial = new THREE.PointsMaterial({
@@ -199,7 +269,7 @@ export default class Particle01 extends React.Component {
     //   size: 2
     // });
     // const particleSystem = new THREE.Points(bufferGeometry, pointMaterial);
-    this.scene.add(particleSystem);
+    this.scene.add(this.particleSystem);
   }
 
   public componentDidMount() {
