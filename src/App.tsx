@@ -1,22 +1,72 @@
 import * as React from 'react';
 import './style.scss';
 import { Route, Switch } from 'react-router';
-import { HashRouter, Link } from 'react-router-dom';
+import { Router, Link } from 'react-router-dom';
+import { createBrowserHistory } from 'history';
+import { routes } from 'routes';
 
-import Introduction from './Introduction';
-import Basic01 from './Basic/Basic01';
-import Basic02 from './Basic/Basic02';
-import Basic03 from './Basic/Basic03';
-import Basic04 from './Basic/Basic04';
+const browserHistory = createBrowserHistory();
 
-import Particle01 from './Particle/Particle01';
+// import Introduction from './components/Introduction';
+// import Basic01 from './comp;onents/Basic/Basic01';
+// import Basic02 from './components/Basic/Basic02';
+// import Basic03 from './components/Basic/Basic03';
+// import Basic04 from './components/Basic/Basic04';
+
+// import Particle01 from './components/Particle/Particle01'
 
 import { Menu } from 'antd'; 
+import { IRoute } from 'models/Route';
 const SubMenu = Menu.SubMenu;
 
 interface IState {
   openKeys: string[];
 }
+
+const RouteWithChildRoutes = (route: IRoute) => {
+  if (route.component) {
+    return (
+      <Route
+        exact={route.exact}
+        path={route.path}
+        component={route.component}
+        key={route.path}
+      />
+    );
+  } else if (route.childRoutes) {
+    return route.childRoutes.map((childRoute, i) => (
+      <Route
+        exact={childRoute.exact}
+        path={route.path + childRoute.path}
+        component={childRoute.component}
+        key={route.path + childRoute.path}
+      />
+    ))
+  } else {
+    return null;
+  }
+};
+
+const MenuWithSubMenu = (route: IRoute) => {
+  if (route.component) {
+    return (
+      <Menu.Item key={route.path}><Link to={route.path}>{route.title}</Link></Menu.Item>
+    );
+  } else if (route.childRoutes) {
+    return (
+      <SubMenu key={route.path} title={<span>{route.title}</span>}>
+        {
+          route.childRoutes.map(childRoute => (
+            <Menu.Item key={route.path + childRoute.path}><Link to={route.path + childRoute.path}>{childRoute.title}</Link></Menu.Item>
+          ))
+        }
+      </SubMenu>
+    );
+  } else {
+    return null;
+  }
+};
+
 class App extends React.Component<any, IState> {
   constructor(props: any) {
     super(props);
@@ -27,34 +77,24 @@ class App extends React.Component<any, IState> {
 
   public render() {
     return (
-      <HashRouter>
+      <Router history={browserHistory}>
         <div id="three-playground">
           <aside>
-            <Menu mode="inline" defaultOpenKeys={['basic']}>
-              <SubMenu key="basic" title={<span>Basic</span>}>
-                <Menu.Item key="basic01"><Link to="/basic/1">Basic Scene</Link></Menu.Item>
-                <Menu.Item key="basic02"><Link to="/basic/2">Wire Frame</Link></Menu.Item>
-                <Menu.Item key="basic03"><Link to="/basic/3">Lambert & Phong</Link></Menu.Item>
-                <Menu.Item key="basic04"><Link to="/basic/4">Shader</Link></Menu.Item>
-              </SubMenu>
-              <SubMenu key="particle" title={<span>Particle</span>}>
-                <Menu.Item key="particle01"><Link to="/particle/1">Particle</Link></Menu.Item>
-              </SubMenu>
+            <Menu mode="inline">
+              {
+                routes.filter(route => route.path !== '/').map(route => MenuWithSubMenu(route))
+              }
             </Menu>
           </aside>
           <main>
             <Switch>
-              <Route path='/index' component={Introduction} />
-              <Route exact={true} path='/' component={Introduction} />
-              <Route path='/basic/1' component={Basic01} />
-              <Route path='/basic/2' component={Basic02} />
-              <Route path='/basic/3' component={Basic03} />
-              <Route path='/basic/4' component={Basic04} />
-              <Route path='/particle/1' component={Particle01} />
+              { 
+                routes.map((route, i) => RouteWithChildRoutes(route))
+              }
             </Switch>
           </main>
         </div>
-      </HashRouter>
+      </Router>
    );
   }
 }
