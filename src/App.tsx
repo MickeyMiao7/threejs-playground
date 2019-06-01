@@ -7,14 +7,6 @@ import { routes } from 'routes';
 
 const browserHistory = createBrowserHistory();
 
-// import Introduction from './components/Introduction';
-// import Basic01 from './comp;onents/Basic/Basic01';
-// import Basic02 from './components/Basic/Basic02';
-// import Basic03 from './components/Basic/Basic03';
-// import Basic04 from './components/Basic/Basic04';
-
-// import Particle01 from './components/Particle/Particle01'
-
 import { Menu } from 'antd'; 
 import { IRoute } from 'models/Route';
 const SubMenu = Menu.SubMenu;

@@ -3,7 +3,6 @@
  * @author Qi Miao <mickey.miao7@gmail.com>
  */
 import * as React from 'react';
-// tslint:disable-next-line
 import * as THREE from 'three';
 import OrbitControls from 'orbit-controls-es6';
 import * as vertexShader from './vertex.glsl';
@@ -12,7 +11,6 @@ import * as robotFBXData from 'resources/models/fbx/pianoModel.fbx';
 import * as guitarFBXData from 'resources/models/fbx/guitar.fbx';
 import loader from 'utils/loader';
 import * as TWEEN from 'three-tween';
-console.log(THREE);
 
 const robotFBX = { data: robotFBXData, format: 'fbx' };
 const guitarFBX = { data: guitarFBXData, format: 'fbx' };

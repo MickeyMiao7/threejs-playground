@@ -49,5 +49,16 @@ export const routes: IRoute[] = [
         title: 'Transform'
       }
     ]
+  },
+  {
+    path: '/shader',
+    title: 'Shader',
+    childRoutes: [
+      {
+        path: '/CartoonRendering',
+        component: Loadable(() => import('components/Shader/CartoonRendering')),
+        title: 'Transform'
+      }
+    ]
   }
 ]
