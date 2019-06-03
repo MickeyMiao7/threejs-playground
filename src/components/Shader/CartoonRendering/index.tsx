@@ -6,12 +6,17 @@ import loader from 'utils/loader';
 import * as appleMTL from 'resources/models/mtl/apple.mtl';
 import * as appleOBJ from 'resources/models/obj/apple.obj';
 
+import * as vertexShader from './vertex.glsl';
+console.log(vertexShader);
+
 export default class CartoonRendering extends React.Component {
   private openglRef = React.createRef<HTMLDivElement>();
   private scene: THREE.Scene;
   private renderer: THREE.WebGLRenderer;
   private camera: THREE.PerspectiveCamera;
   private controls: OrbitControls
+  
+  private keyLight: THREE.SpotLight;
 
   constructor(props: any) {
     super(props);
@@ -33,10 +38,10 @@ export default class CartoonRendering extends React.Component {
   }
 
   public createLights = () => {
-    const keyLight = new THREE.SpotLight(0xffffff, 1, 5000, Math.PI / 6, 25);
-    keyLight.position.set(1000, 1000, 500);
-    keyLight.target.position.set(100, 0, 0);
-    this.scene.add(keyLight);
+    this.keyLight = new THREE.SpotLight(0xffffff, 1, 5000, Math.PI / 6, 25);
+    this.keyLight.position.set(1000, 1000, 500);
+    this.keyLight.target.position.set(100, 0, 0);
+    this.scene.add(this.keyLight);
 
     const fillLight = new THREE.SpotLight(0xffffff, 0.4, 1000, Math.PI / 6, 25);
     fillLight.position.set(80, -20, -200);
