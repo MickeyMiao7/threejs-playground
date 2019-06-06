@@ -1,3 +1,6 @@
+/**
+ * Reference: http://zhangwenli.com/blog/2017/03/05/cartoon-shading-1/
+ */
 import * as React from 'react';
 import * as THREE from 'three';
 import OrbitControls from 'orbit-controls-es6';
@@ -6,8 +9,8 @@ import loader from 'utils/loader';
 import * as appleMTL from 'resources/models/mtl/apple.mtl';
 import * as appleOBJ from 'resources/models/obj/apple.obj';
 
-import * as vertexShader from './vertex.glsl';
-console.log(vertexShader);
+import * as vertexShader from './CartoonShader/vertex.glsl';
+import * as fragmentShader from './CartoonShader/fragment.glsl';
 
 export default class CartoonRendering extends React.Component {
   private openglRef = React.createRef<HTMLDivElement>();
@@ -18,8 +21,14 @@ export default class CartoonRendering extends React.Component {
   
   private keyLight: THREE.SpotLight;
 
+  private appleMesh: THREE.Mesh;
+  private stemMesh: THREE.Mesh;
+
+  private lightUniform: any;
+
   constructor(props: any) {
     super(props);
+    console.log(this.stemMesh);
     this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     this.renderer.setSize(1200, 800);
     this.renderer.setClearColor(0x000000);
@@ -33,8 +42,7 @@ export default class CartoonRendering extends React.Component {
     this.controls = new OrbitControls(this.camera);
     this.controls.update();
 
-    this.createLights();
-    this.createObjects();
+
   }
 
   public createLights = () => {
@@ -42,6 +50,10 @@ export default class CartoonRendering extends React.Component {
     this.keyLight.position.set(1000, 1000, 500);
     this.keyLight.target.position.set(100, 0, 0);
     this.scene.add(this.keyLight);
+    this.lightUniform = {
+      type: 'v3',
+      value: this.keyLight.position
+    };
 
     const fillLight = new THREE.SpotLight(0xffffff, 0.4, 1000, Math.PI / 6, 25);
     fillLight.position.set(80, -20, -200);
@@ -52,16 +64,31 @@ export default class CartoonRendering extends React.Component {
     this.scene.add(backLight);
   }
 
-  public createObjects = () => {
-    loader([
-      { data: [appleMTL, appleOBJ], format: 'mtl-obj', path: ['resourses/models/mtl/']}, 
-    ])
-    .then(([apple]: any) => {
-      apple.position.set(-50, -50, 0);
-      this.scene.add(apple);
-    })
-
+  public createObjects = async () => {
+    const [apple]: any = await loader([
+      { data: [appleMTL, appleOBJ], format: 'mtl-obj', path: ['resources/models/mtl/']}, 
+    ]);
+    apple.position.set(-50, -50, 0);
+    this.scene.add(apple);
+    this.appleMesh = apple.children[0];
+    this.stemMesh = apple.children[1];
   }
+
+  public appleShader = () => {
+    const material = new THREE.ShaderMaterial({
+      vertexShader,
+      fragmentShader,
+      uniforms: {
+        color: {
+          type: 'v3',
+          value: new THREE.Color('#60371b')
+        },
+        light: this.lightUniform
+      }
+    });
+    this.appleMesh.material = material;
+  }
+
 
   public animate = () => {
     this.controls.update();
@@ -69,9 +96,14 @@ export default class CartoonRendering extends React.Component {
     requestAnimationFrame(this.animate);
   }
 
-  public componentDidMount() {
+  public async componentDidMount() {
     const container = this.openglRef.current as HTMLElement;
     container.appendChild(this.renderer.domElement)
+
+    this.createLights();
+    await this.createObjects();
+    this.appleShader();
+
     this.animate();
     // requestAnimationFrame(this.animate);
   }
