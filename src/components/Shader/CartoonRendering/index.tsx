@@ -9,8 +9,10 @@ import loader from 'utils/loader';
 import * as appleMTL from 'resources/models/mtl/apple.mtl';
 import * as appleOBJ from 'resources/models/obj/apple.obj';
 
-import * as vertexShader from './CartoonShader/vertex.glsl';
-import * as fragmentShader from './CartoonShader/fragment.glsl';
+import * as vertexShader from './SilhouetteShader/vertex.glsl';
+import * as fragmentShader from './SilhouetteShader/fragment.glsl';
+
+const SILHOUETTE_LIMIT = 0.5;
 
 export default class CartoonRendering extends React.Component {
   private openglRef = React.createRef<HTMLDivElement>();
@@ -31,7 +33,7 @@ export default class CartoonRendering extends React.Component {
     console.log(this.stemMesh);
     this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     this.renderer.setSize(1200, 800);
-    this.renderer.setClearColor(0x000000);
+    this.renderer.setClearColor(0xf3f3f3);
 
     this.scene = new THREE.Scene(); 
     this.camera = new THREE.PerspectiveCamera(60, 1200 / 800, 1, 10000);
@@ -83,7 +85,11 @@ export default class CartoonRendering extends React.Component {
           type: 'v3',
           value: new THREE.Color('#60371b')
         },
-        light: this.lightUniform
+        light: this.lightUniform,
+        silhouetteLimit: {
+          type: 'float',
+          value: SILHOUETTE_LIMIT
+        }
       }
     });
     this.appleMesh.material = material;
