@@ -45,6 +45,8 @@ export default class PixelShader extends React.Component {
     const container = this.openglRef.current as HTMLElement;
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setSize(container.clientWidth || WIDTH, container.clientHeight || HEIGHT);
+    this.uniforms.iResolution.value.x = container.clientWidth;
+    this.uniforms.iResolution.value.y = container.clientHeight;
     this.renderer.setPixelRatio(window.devicePixelRatio);
 
     this.scene = new THREE.Scene(); 
@@ -71,6 +73,8 @@ export default class PixelShader extends React.Component {
     window.onresize = () => {
       const container = this.openglRef.current as HTMLElement;
       this.renderer.setSize(container.clientWidth || WIDTH, container.clientHeight || HEIGHT);
+      this.uniforms.iResolution.value.x = container.clientWidth;
+      this.uniforms.iResolution.value.y = container.clientHeight;
     }
   }
   
