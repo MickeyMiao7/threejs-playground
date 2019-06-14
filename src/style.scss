@@ -1,35 +1,39 @@
-html, body, #root {
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root, #three-playground {
   width: 100%;
   height: 100%;
+  overflow: hidden;
   margin: 0;
   padding: 0;
   font-family: sans-serif;
 }
 
 #three-playground {
-  width: 100%;
-  height: 100%;
   display: flex;
 }
 
-aside {
-  flex: 0 0 250px;
-}
 
-main {
-  flex-grow: 1;
-  display: flex;
+#root  {
+  aside {
+    flex: 0 0 250px;
+  }
+  main {
+    flex-basis: calc(100% - 250px);
+    display: inline-block;
+    overflow: hidden;
+  }
 }
 
 main > div {
-  display: flex;
-  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 #webgl-canvas {
   width: 100%;
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }

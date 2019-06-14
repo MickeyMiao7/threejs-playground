@@ -60,5 +60,16 @@ export const routes: IRoute[] = [
         title: 'Transform'
       }
     ]
+  },
+  {
+    path: '/pixel-shader',
+    title: 'Pixel Shader',
+    childRoutes: [
+      {
+        path: '/index',
+        component: Loadable(() => import('components/PixelShader')),
+        title: 'PixelShader'
+      }
+    ]
   }
 ]
