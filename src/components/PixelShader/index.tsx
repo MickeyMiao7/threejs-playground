@@ -15,7 +15,7 @@ export default class PixelShader extends React.Component {
 
   private uniforms = {
     resolution: {
-      value: new THREE.Vector2(WIDTH, HEIGHT)
+      value: new THREE.Vector2()
     },
     iTime: {
       type: 'f',
@@ -45,6 +45,8 @@ export default class PixelShader extends React.Component {
     const container = this.openglRef.current as HTMLElement;
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setSize(container.clientWidth || WIDTH, container.clientHeight || HEIGHT);
+    this.uniforms.resolution.value.x = container.clientWidth;
+    this.uniforms.resolution.value.y = container.clientHeight;
     this.uniforms.iResolution.value.x = container.clientWidth;
     this.uniforms.iResolution.value.y = container.clientHeight;
     this.renderer.setPixelRatio(window.devicePixelRatio);
