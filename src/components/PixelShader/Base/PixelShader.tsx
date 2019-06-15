@@ -2,12 +2,15 @@ import * as React from 'react';
 import * as THREE from 'three';
 
 import * as vertexShader from './vertex.glsl';
-import * as fragmentShader from './fragment.glsl';
 
 const WIDTH = 800;
 const HEIGHT = 800;
 
-export default class PixelShader extends React.Component {
+interface IProps {
+  fragmentShader: string;
+}
+
+export default class PixelShader extends React.Component<IProps> {
   private openglRef = React.createRef<HTMLDivElement>();
   private renderer: THREE.WebGLRenderer;
   private scene: THREE.Scene;
@@ -42,6 +45,7 @@ export default class PixelShader extends React.Component {
   }
 
   public init() {
+    const { fragmentShader } = this.props;
     const container = this.openglRef.current as HTMLElement;
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setSize(container.clientWidth || WIDTH, container.clientHeight || HEIGHT);
@@ -89,3 +93,4 @@ export default class PixelShader extends React.Component {
     return <div ref={this.openglRef} onMouseMove={this.onMouseMove} />
   }
 }
+

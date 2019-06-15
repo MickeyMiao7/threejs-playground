@@ -66,10 +66,15 @@ export const routes: IRoute[] = [
     title: 'Pixel Shader',
     childRoutes: [
       {
-        path: '/index',
-        component: Loadable(() => import('components/PixelShader')),
-        title: 'PixelShader'
-      }
+        path: '/basic',
+        component: Loadable(() => import('components/PixelShader/Basic')),
+        title: 'Base'
+      },
+      {
+        path: '/smile',
+        component: Loadable(() => import('components/PixelShader/Smile')),
+        title: 'Smile'
+      },
     ]
   }
 ]
