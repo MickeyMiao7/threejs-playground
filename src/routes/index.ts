@@ -75,6 +75,11 @@ export const routes: IRoute[] = [
         component: Loadable(() => import('components/PixelShader/Smile')),
         title: 'Smile'
       },
+      {
+        path: '/route',
+        component: Loadable(() => import('components/PixelShader/Heart')),
+        title: 'Heart'
+      },
     ]
   }
 ]
