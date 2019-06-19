@@ -71,12 +71,17 @@ export const routes: IRoute[] = [
         title: 'Base'
       },
       {
+        path: '/circle-and-line',
+        component: Loadable(() => import('components/PixelShader/CircleAndLine')),
+        title: 'Circle And Line'
+      },
+      {
         path: '/smile',
         component: Loadable(() => import('components/PixelShader/Smile')),
         title: 'Smile'
       },
       {
-        path: '/route',
+        path: '/heart',
         component: Loadable(() => import('components/PixelShader/Heart')),
         title: 'Heart'
       },

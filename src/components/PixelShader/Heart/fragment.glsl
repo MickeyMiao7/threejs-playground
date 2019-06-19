@@ -2,36 +2,15 @@ uniform vec2 iResolution;
 uniform float iTime;
 uniform vec2 iMouse;
 
+vec4 Circle(vec2 uv, vec2 p, float radius, vec3 color, float antialias) {
+  float d = length(uv - p) - radius;
+  float c = smoothstep(0., antialias, d);
+  // vec3 _color = color * (1. - c);
+  // return vec4(_color, 1.);
+  return vec4(color, 1. - c);
+}
+
 void main() {
-	 	vec2 p = (2.0*gl_FragCoord.xy-iResolution.xy)/min(iResolution.y,iResolution.x);
-	
-		p.y -= 0.25;
-		
-    	// background color
-    	vec3 bcol = vec3(1.0,0.8,0.7-0.07*p.y)*(1.0-0.25*length(p));
-		
-    	// animate
-    	float tt = mod(iTime,1.5)/1.5;
-    	float ss = pow(tt,.2)*0.5 + 0.5;
-    	ss = 1.0 + ss*0.5*sin(tt*6.2831*3.0 + p.y*0.5)*exp(-tt*4.0);
-    	p *= vec2(0.5,1.5) + ss*vec2(0.5,-0.5);
-    	
-		
-    	// shape
-    	float a = atan(p.x,p.y)/3.141593;
-    	float r = length(p);
-    	float h = abs(a);
-    	float d = (13.0*h - 22.0*h*h + 10.0*h*h*h)/(6.0-5.0*h);
-		
-		// color
-		float s = 1.0-0.5*clamp(r/d,0.0,1.0);
-		s = 0.75 + 0.75*p.x;
-		s *= 1.0-0.25*r;
-		s = 0.5 + 0.6*s;
-		s *= 0.5+0.5*pow( 1.0-clamp(r/d, 0.0, 1.0 ), 0.1 );
-		vec3 hcol = vec3(1.0,0.5*r,0.3)*s;
-		
-    	vec3 col = mix( bcol, hcol, smoothstep( -0.01, 0.01, d-r) );
-		
-    gl_FragColor = vec4(col, 1.);
+	 	vec2 pos = (2.0 * gl_FragCoord.xy - iResolution.xy) / min(iResolution.y, iResolution.x);
+    gl_FragColor = Circle(pos, vec2(0., 0.), .5, vec3(1., 1., 0.), .01);
 	}
