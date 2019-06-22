@@ -16,6 +16,7 @@ export default class PixelShader extends React.Component<IProps> {
   private renderer: THREE.WebGLRenderer;
   private scene: THREE.Scene;
   private camera: THREE.Camera;
+  private clock = new THREE.Clock();
 
   private uniforms = {
     resolution: {
@@ -23,7 +24,11 @@ export default class PixelShader extends React.Component<IProps> {
     },
     iTime: {
       type: 'f',
-      value: 1.0
+      value: 0.0
+    },
+    iTimeDelta: {
+      type: 'f',
+      value: 0.0
     },
     iResolution: {
       type: 'v2',
@@ -32,6 +37,13 @@ export default class PixelShader extends React.Component<IProps> {
     iMouse: {
       type: 'v2',
       value: new THREE.Vector2()
+    },
+    iFrame: {
+      type: 'i1',
+      value: 0
+    },
+    iDate: { 
+      value: new THREE.Vector4() 
     }
   };
   constructor(props: any) {
@@ -40,7 +52,15 @@ export default class PixelShader extends React.Component<IProps> {
   }
 
   public animate = () => {
-    this.uniforms.iTime.value += 0.05;
+    this.uniforms.iTime.value = this.clock.getElapsedTime();
+    this.uniforms.iTimeDelta.value = this.clock.getDelta();
+    this.uniforms.iFrame.value = this.uniforms.iFrame.value + 1;
+
+    const date = new Date;
+    this.uniforms.iDate.value = new THREE.Vector4(
+      date.getFullYear(), date.getMonth(), date.getDay(), date.getSeconds() + (60 * date.getMinutes()) + (60 * 60 * date.getHours())
+    );
+
     requestAnimationFrame(this.animate);
     this.renderer.render(this.scene, this.camera);
   }
