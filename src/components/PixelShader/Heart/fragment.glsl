@@ -23,8 +23,8 @@ vec4 Heart(vec2 uv) {
     return vec4(color, smoothstep(-.01, .01, d - r));
 }
 
-void main() {
-	 	vec2 pos = (2.0 * gl_FragCoord.xy - iResolution.xy) / min(iResolution.x, iResolution.y);
+void mainImage(out vec4 fragColor, in vec2 fragCoord ) {
+	 	vec2 pos = (2.0 * fragCoord.xy - iResolution.xy) / min(iResolution.x, iResolution.y);
     pos.y -= 0.25;
 
     // animate
@@ -37,6 +37,6 @@ void main() {
     vec4 bgColor = vec4(vec3(1., .8, .7 - .07 * pos.y) * (1. - .25 * length(pos)), 1.);
     vec4 heart = Heart(pos);
     
-    gl_FragColor = mix(bgColor, heart, heart.a);
+    fragColor = mix(bgColor, heart, heart.a);
 }
 

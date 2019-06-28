@@ -86,5 +86,16 @@ export const routes: IRoute[] = [
         title: 'Heart'
       },
     ]
+  },
+  {
+    path: '/the-book-of-shaders',
+    title: 'The Book Of Shader - Exercise',
+    childRoutes: [
+      {
+        path: '/chapter-07',
+        component: Loadable(() => import('components/Book/Chapter07')),
+        title: 'Chapter07 - Shapes'
+      }
+    ]
   }
 ]

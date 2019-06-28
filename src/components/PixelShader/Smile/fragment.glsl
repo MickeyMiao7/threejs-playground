@@ -25,8 +25,8 @@ float Smile(vec2 uv, vec2 p, float size) {
     return c;
 }
 
-void main() {
-    vec2 uv = gl_FragCoord.xy / iResolution.xy;
+ void mainImage(out vec4 fragColor, in vec2 fragCoord ) {
+    vec2 uv = fragCoord.xy / iResolution.xy;
     uv -= 0.5;
     uv.x = uv.x * iResolution.x / iResolution.y;
 
@@ -34,6 +34,5 @@ void main() {
     float c = Smile(uv, p, .5);
     vec3 color = vec3(1., 1., 0.) * c;
 
-    gl_FragColor = vec4(color, 1.);
+    fragColor = vec4(color, 1.);
 }
- 

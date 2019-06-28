@@ -17,13 +17,14 @@ vec4 Line(vec2 uv, vec2 point0, vec2 point1, float width, vec3 color, float anti
   return vec4(color, 1. - t);
 }
 
-void main() {
-	 	vec2 pos = (2.0 * gl_FragCoord.xy - iResolution.xy) / min(iResolution.y, iResolution.x);
+void mainImage(out vec4 fragColor, in vec2 fragCoord ) {
+	 	vec2 pos = (2.0 * fragCoord.xy - iResolution.xy) / min(iResolution.y, iResolution.x);
 
     vec4 bgColor = vec4(0., 0., 0., 1.);
     vec4 circle = Circle(pos, vec2(0., 0.), .5, vec3(1., 1., 0.), .01);
     vec4 line = Line(pos, vec2(0., 0.), vec2(.5, .5), .05, vec3(0., 0., 1.), .01);
     vec4 color = mix(bgColor, circle, circle.a);
     color = mix(color, line, line.a);
-    gl_FragColor = color;
+    fragColor = color;
 }
+

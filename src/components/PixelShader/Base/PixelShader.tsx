@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as THREE from 'three';
 
 import * as vertexShader from './vertex.glsl';
+import * as fragmentShaderPallet from './fragment.glsl';
 import { AdditiveBlending } from 'three';
 
 const WIDTH = 800;
@@ -85,9 +86,10 @@ export default class PixelShader extends React.Component<IProps> {
     const material = new THREE.ShaderMaterial({
       uniforms: this.uniforms,
       vertexShader,
-      fragmentShader,
+      fragmentShader: fragmentShader + '\n' + fragmentShaderPallet,
       blending: AdditiveBlending                                 // 使得Alpha Channel Work
     });
+    console.log(material);
     const mesh = new THREE.Mesh(geometry, material);
     this.scene.add(mesh);
 
