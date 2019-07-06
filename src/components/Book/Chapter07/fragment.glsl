@@ -26,16 +26,24 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord ) {
     // vec3 color = Circle(st, vec2(.0, .0), .5, .05, vec3(1., 0., 0.) );
     // fragColor = vec4(color, 1.);
 
-    vec3 circle1 = Circle(st, vec2(.5, .5), .1, .01, vec3(.3, 0., 0.));
-    vec3 circle2 = Circle(st, vec2(.8, .8), .1, .05, vec3(0., .4, 0.));
-    vec3 color = circle1 + circle2;
-    fragColor = vec4(color, 1.);
+    // vec3 circle1 = Circle(st, vec2(.5, .5), .1, .01, vec3(.3, 0., 0.));
+    // vec3 circle2 = Circle(st, vec2(.8, .8), .1, .05, vec3(0., .4, 0.));
+    // vec3 color = circle1 + circle2;
+    // fragColor = vec4(color, 1.);
 
-    float pct;
-    pct = distance(st,vec2(0.4)) + distance(st,vec2(0.6));
-    pct = distance(st,vec2(0.4)) * distance(st,vec2(0.6));
-    pct = min(distance(st,vec2(0.4)),distance(st,vec2(0.6)));
+    // float pct;
+    // pct = distance(st,vec2(0.4)) + distance(st,vec2(0.6));
+    // pct = distance(st,vec2(0.4)) * distance(st,vec2(0.6));
+    // pct = min(distance(st,vec2(0.4)),distance(st,vec2(0.6)));
     // pct = max(distance(st,vec2(0.4)),distance(st,vec2(0.6)));
     // pct = pow(distance(st,vec2(0.4)),distance(st,vec2(0.6)));
-    fragColor = vec4(vec3(pct), 1.);
+    // fragColor = vec4(vec3(pct), 1.);
+    st = st * 2. - 1.;
+    float d = 0.;
+    d = length(st - .3);
+    // d = length(abs(st) - .3);
+    // d = length(min(abs(st) - .3, 0.) );
+    // d = length( max(abs(st)-.3,0.) );
+
+    fragColor = vec4(vec3(fract(d * 10.)), 1.);
 }
