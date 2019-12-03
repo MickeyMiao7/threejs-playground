@@ -4,6 +4,7 @@ uniform float iTime;
 uniform vec2 iMouse;
 
 
+// perlin
 void mainImage(out vec4 fragColor, in vec2 fragCoord ) {
 	 	vec2 pos = (2.0 * fragCoord.xy - iResolution.xy) / min(iResolution.x, iResolution.y);
     pos.y -= 0.25;
@@ -20,4 +21,3 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord ) {
     
     fragColor = mix(bgColor, heart, heart.a);
 }
-
